@@ -1,14 +1,16 @@
 # MagicLoop
 A software program to find infinite combos in magic the gathering.
 
+## Note
+This software just finds loops, it by no means indicates that you can pull them off, it's simply here to indicate combo synergy between cards.
+
 #  How it works
 The program loops over all of the cards in existence, for each one it simulates a custom game with up to `n` cards (you can specify `n` on the command line).
 
 ##  The custom game
 To simulate the  game, some assumptions are made:
-1. The player's  deck is never empty
-2. The player's graveyard starts empty
-3. The Opponent always satisfies whatever the player needs, (always has cards in their hand, always has cards in the deck, always has permanents, etc...)
+1. Assume ideal conditions for the player (deck is full, graveyard is empty, playing field is empty, mana cost is always satisfied)
+2. The Opponent always satisfies whatever the player needs, (always has cards in their hand, always has cards in the deck, always has permanents, etc...)
 
 This allows for finding loops, even in ideal conditions.
 
