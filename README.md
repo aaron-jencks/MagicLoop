@@ -9,8 +9,8 @@ The program loops over all of the cards in existence, for each one it simulates 
 
 ##  The custom game
 To simulate the  game, some assumptions are made:
-1. Assume ideal conditions for the player (deck is full, graveyard is empty, playing field is empty, mana cost is always satisfied)
-2. The Opponent always satisfies whatever the player needs, (always has cards in their hand, always has cards in the deck, always has permanents, etc...)
+1. Assume ideal conditions for the player (deck is full, graveyard is empty, playing field is empty, mana cost is always satisfied, all of the combo cards are in the player's hand)
+2. The Opponent always satisfies whatever the player needs, (always has cards in their hand, always has cards in the deck, always has permanents, they never have any responses, etc...)
 
 This allows for finding loops, even in ideal conditions.
 
