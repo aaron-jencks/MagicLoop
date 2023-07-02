@@ -1,4 +1,4 @@
-module magicloop
+module github.com/aaron-jencks/magicloop
 
 go 1.18
 
