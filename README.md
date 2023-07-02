@@ -13,6 +13,7 @@ To simulate the  game, some assumptions are made:
 2. The Opponent always satisfies whatever the player needs, (always has cards in their hand, always has cards in the deck, always has permanents, they never have any responses, etc...)
 3. The combo takes place on a single turn
 4. The combo must be self-sustaining it must generate it's own mana, if needed, or untap mana, etc... The combo cannot abuse the assumptions to function.
+5. The combo must reference the root card at least once per cycle (otherwise, why is the root card there?)
 
 This allows for finding loops, even in ideal conditions.
 
