@@ -1,31 +1,60 @@
 package magicloop
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"os"
 
-	"github.com/MagicTheGathering/mtg-sdk-go"
+	scryfall "github.com/BlueMonday/go-scryfall"
 )
 
-type Card struct {
-	Id    string   // unique Id of the card
-	Name  string   // the card name
-	Types []string // the types of the card
-	Text  string   // the oracle text of the card
+type CardFace struct {
+	Name     string // the name of the face
+	ManaCost string // the mana cost of the face, if any
+	Type     string // the type string of the face, if any
+	Text     string // the printed text for this face, if any
 }
 
-func CreateCardFromSDK(c *mtg.Card) Card {
+type Card struct {
+	Id            string           // unique Id of the card
+	Name          string           // the card name
+	Type          string           // the types of the card
+	Text          string           // the oracle text of the card
+	Layout        scryfall.Layout  // for detecting flip cards
+	ManaCost      string           // the mana cost of the card
+	ColorIdentity []scryfall.Color // the color identity of the card
+	CardFaces     []CardFace       // the faces of this card
+}
+
+func CreateCardFromSDK(c scryfall.Card) Card {
+	var cardfaces []CardFace = nil
+	if len(c.CardFaces) > 0 {
+		cardfaces = make([]CardFace, 0, len(c.CardFaces))
+		for _, cf := range c.CardFaces {
+			cardfaces = append(cardfaces, CardFace{
+				Name:     cf.Name,
+				ManaCost: cf.ManaCost,
+				Type:     cf.TypeLine,
+				Text:     *cf.OracleText,
+			})
+		}
+	}
 	return Card{
-		Id:    string(c.Id),
-		Name:  c.Name,
-		Types: c.Types,
-		Text:  c.Text,
+		Id:            c.OracleID,
+		Name:          c.Name,
+		Type:          c.TypeLine,
+		Text:          c.OracleText,
+		Layout:        c.Layout,
+		ManaCost:      c.ManaCost,
+		ColorIdentity: c.ColorIdentity,
+		CardFaces:     cardfaces,
 	}
 }
 
 var cards []Card
+var transforms map[string]Card
 
 func GetValidCards(excludes []Card) []Card {
 	result := make([]Card, 0, len(cards))
@@ -53,7 +82,13 @@ func saveCache(cacheLog string) error {
 		return err
 	}
 
-	cenc, err := json.Marshal(cards)
+	cenc, err := json.Marshal(struct {
+		Cards      []Card
+		Transforms map[string]Card
+	}{
+		cards,
+		transforms,
+	})
 	if err != nil {
 		rerr := fp.Close()
 		if rerr != nil {
@@ -97,11 +132,25 @@ func FetchCards(cacheLoc string, force bool) error {
 		return loadCache(cacheLoc)
 	} else {
 		log.Default().Println("Generating new cache on disk.")
-		scards, err := mtg.NewQuery().Where(mtg.CardSet, "MOM").All()
+
+		client, err := scryfall.NewClient()
 		if err != nil {
 			return err
 		}
-		for _, sc := range scards {
+
+		sco := scryfall.SearchCardsOptions{
+			Unique:        scryfall.UniqueModeCards,
+			Order:         scryfall.OrderColor,
+			Dir:           scryfall.DirDesc,
+			IncludeExtras: false,
+		}
+
+		scards, err := client.SearchCards(context.Background(), "set:mom is:transform", sco)
+		if err != nil {
+			return err
+		}
+
+		for _, sc := range scards.Cards {
 			cards = append(cards, CreateCardFromSDK(sc))
 		}
 		return saveCache(cacheLoc)
