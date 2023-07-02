@@ -1,8 +1,10 @@
-package magicloop
+package main
 
 import (
 	"flag"
 	"log"
+
+	"github.com/aaron-jencks/magicloop"
 )
 
 var comboSize int
@@ -16,7 +18,7 @@ func initializeFlags() {
 
 func main() {
 	initializeFlags()
-	err := FetchCards(cardCache)
+	err := magicloop.FetchCards(cardCache)
 	if err != nil {
 		log.Fatalf("Failed to generate card cache: %s\n", err.Error())
 		return
