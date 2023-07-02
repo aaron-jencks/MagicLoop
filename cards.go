@@ -9,14 +9,30 @@ import (
 	"github.com/MagicTheGathering/mtg-sdk-go"
 )
 
-var cards []*mtg.Card
+type Card struct {
+	Id    string   // unique Id of the card
+	Name  string   // the card name
+	Types []string // the types of the card
+	Text  string   // the oracle text of the card
+}
 
-func GetValidCards(excludes []mtg.Card) []mtg.Card {
-	result := make([]mtg.Card, 0, len(cards))
+func CreateCardFromSDK(c *mtg.Card) Card {
+	return Card{
+		Id:    string(c.Id),
+		Name:  c.Name,
+		Types: c.Types,
+		Text:  c.Text,
+	}
+}
+
+var cards []Card
+
+func GetValidCards(excludes []Card) []Card {
+	result := make([]Card, 0, len(cards))
 	for _, c := range cards {
 		for _, e := range excludes {
-			if e.MultiverseId != c.MultiverseId {
-				result = append(result, *c)
+			if e.Id != c.Id {
+				result = append(result, c)
 			}
 		}
 	}
@@ -75,14 +91,18 @@ func saveCache(cacheLog string) error {
 	return nil
 }
 
-func FetchCards(cacheLoc string) error {
-	if FileExists(cacheLoc) {
+func FetchCards(cacheLoc string, force bool) error {
+	if !force && FileExists(cacheLoc) {
+		log.Default().Println("Reading cache from disk.")
 		return loadCache(cacheLoc)
 	} else {
-		var err error
-		cards, err = mtg.NewQuery().Where(mtg.CardSet, "MOM").All()
+		log.Default().Println("Generating new cache on disk.")
+		scards, err := mtg.NewQuery().Where(mtg.CardSet, "MOM").All()
 		if err != nil {
 			return err
+		}
+		for _, sc := range scards {
+			cards = append(cards, CreateCardFromSDK(sc))
 		}
 		return saveCache(cacheLoc)
 	}

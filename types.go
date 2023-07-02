@@ -1,7 +1,5 @@
 package magicloop
 
-import "github.com/MagicTheGathering/mtg-sdk-go"
-
 const (
 	MANA_WILD = iota
 	MANA_COLORLESS
@@ -27,9 +25,9 @@ const (
 type Game struct {
 	deck_count    int
 	life          int
-	graveyard     []mtg.Card
-	exile         []mtg.Card
-	mapped_exiles map[string][]mtg.Card
+	graveyard     []Card
+	exile         []Card
+	mapped_exiles map[string][]Card
 	counters      map[int]int
 	stack         []IAction
 	mana          map[int]int
@@ -40,7 +38,7 @@ type GameState struct {
 	game            IGame
 	previous_states []IGame
 	actions         []IAction
-	cards           []mtg.Card
+	cards           []Card
 }
 
 type Simulation struct {
