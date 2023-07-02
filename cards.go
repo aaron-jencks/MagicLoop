@@ -129,7 +129,12 @@ func saveCache(cacheLog string) error {
 func FetchCards(cacheLoc string, force bool) error {
 	if !force && FileExists(cacheLoc) {
 		log.Default().Println("Reading cache from disk.")
-		return loadCache(cacheLoc)
+		err := loadCache(cacheLoc)
+		if err != nil {
+			return err
+		}
+		log.Default().Printf("Found %d cards\n", len(cards))
+		return nil
 	} else {
 		log.Default().Println("Generating new cache on disk.")
 
@@ -153,6 +158,8 @@ func FetchCards(cacheLoc string, force bool) error {
 		for _, sc := range scards.Cards {
 			cards = append(cards, CreateCardFromSDK(sc))
 		}
+
+		log.Default().Printf("Found %d cards\n", len(cards))
 		return saveCache(cacheLoc)
 	}
 }
