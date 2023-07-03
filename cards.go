@@ -53,14 +53,13 @@ func CreateCardFromSDK(c scryfall.Card) Card {
 	}
 }
 
-var cards []Card
-var transforms map[string]Card
+var cards []scryfall.Card
 
-func GetValidCards(excludes []Card) []Card {
-	result := make([]Card, 0, len(cards))
+func GetValidCards(excludes []scryfall.Card) []scryfall.Card {
+	result := make([]scryfall.Card, 0, len(cards))
 	for _, c := range cards {
 		for _, e := range excludes {
-			if e.Id != c.Id {
+			if e.OracleID != c.OracleID {
 				result = append(result, c)
 			}
 		}
@@ -82,13 +81,7 @@ func saveCache(cacheLog string) error {
 		return err
 	}
 
-	cenc, err := json.Marshal(struct {
-		Cards      []Card
-		Transforms map[string]Card
-	}{
-		cards,
-		transforms,
-	})
+	cenc, err := json.Marshal(cards)
 	if err != nil {
 		rerr := fp.Close()
 		if rerr != nil {
@@ -150,14 +143,12 @@ func FetchCards(cacheLoc string, force bool) error {
 			IncludeExtras: false,
 		}
 
-		scards, err := client.SearchCards(context.Background(), "set:mom is:transform", sco)
+		scards, err := client.SearchCards(context.Background(), "set:mom", sco)
 		if err != nil {
 			return err
 		}
 
-		for _, sc := range scards.Cards {
-			cards = append(cards, CreateCardFromSDK(sc))
-		}
+		cards = scards.Cards
 
 		log.Default().Printf("Found %d cards\n", len(cards))
 		return saveCache(cacheLoc)
