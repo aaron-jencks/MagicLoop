@@ -39,7 +39,8 @@ type Card struct {
 
 func (c Card) Equals(o Card) bool {
 	if len(c.ColorIdentity) != len(o.ColorIdentity) ||
-		len(c.CardFaces) != len(o.CardFaces) {
+		len(c.CardFaces) != len(o.CardFaces) ||
+		len(c.Counters) != len(o.Counters) {
 		return false
 	}
 
@@ -65,6 +66,13 @@ func (c Card) Equals(o Card) bool {
 			}
 		}
 		if !found {
+			return false
+		}
+	}
+
+	for k, v := range c.Counters {
+		ov, ok := o.Counters[k]
+		if !ok || v != ov {
 			return false
 		}
 	}
