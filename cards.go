@@ -17,6 +17,13 @@ type CardFace struct {
 	Text     string // the printed text for this face, if any
 }
 
+func (cf CardFace) Equals(o CardFace) bool {
+	return cf.Name == o.Name &&
+		cf.ManaCost == o.ManaCost &&
+		cf.Type == o.Type &&
+		cf.Text == o.Text
+}
+
 type Card struct {
 	Id            string           // unique Id of the card
 	Name          string           // the card name
@@ -26,6 +33,47 @@ type Card struct {
 	ManaCost      string           // the mana cost of the card
 	ColorIdentity []scryfall.Color // the color identity of the card
 	CardFaces     []CardFace       // the faces of this card
+	CardFace      int              // the current face of the card
+}
+
+func (c Card) Equals(o Card) bool {
+	if len(c.ColorIdentity) != len(o.ColorIdentity) ||
+		len(c.CardFaces) != len(o.CardFaces) {
+		return false
+	}
+
+	for _, ci := range c.ColorIdentity {
+		found := false
+		for _, oci := range o.ColorIdentity {
+			if ci == oci {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
+	for _, ci := range c.CardFaces {
+		found := false
+		for _, oci := range o.CardFaces {
+			if ci.Equals(oci) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
+	return c.Id == o.Id &&
+		c.Name == o.Name &&
+		c.Type == o.Type &&
+		c.Text == o.Text &&
+		c.Layout == o.Layout &&
+		c.ManaCost == o.ManaCost
 }
 
 func CreateCardFromSDK(c scryfall.Card) Card {
@@ -53,13 +101,13 @@ func CreateCardFromSDK(c scryfall.Card) Card {
 	}
 }
 
-var cards []scryfall.Card
+var cards []Card
 
-func GetValidCards(excludes []scryfall.Card) []scryfall.Card {
-	result := make([]scryfall.Card, 0, len(cards))
+func GetValidCards(excludes []Card) []Card {
+	result := make([]Card, 0, len(cards))
 	for _, c := range cards {
 		for _, e := range excludes {
-			if e.OracleID != c.OracleID {
+			if e.Id != c.Id {
 				result = append(result, c)
 			}
 		}
@@ -148,7 +196,41 @@ func FetchCards(cacheLoc string, force bool) error {
 			return err
 		}
 
-		cards = scards.Cards
+		for _, sc := range scards.Cards {
+			cards = append(cards, CreateCardFromSDK(sc))
+		}
+
+		log.Default().Printf("Found %d cards\n", len(cards))
+		return saveCache(cacheLoc)
+	}
+}
+
+func FetchCardsFromFile(filename, cacheLoc string, force bool) error {
+	if !force && FileExists(cacheLoc) {
+		log.Default().Println("Reading cache from disk.")
+		err := loadCache(cacheLoc)
+		if err != nil {
+			return err
+		}
+		log.Default().Printf("Found %d cards\n", len(cards))
+		return nil
+	} else {
+		log.Default().Println("Generating new cache on disk.")
+
+		data, err := ioutil.ReadFile(filename)
+		if err != nil {
+			return err
+		}
+
+		var scards []scryfall.Card
+		err = json.Unmarshal(data, &scards)
+		if err != nil {
+			return err
+		}
+
+		for _, sc := range scards {
+			cards = append(cards, CreateCardFromSDK(sc))
+		}
 
 		log.Default().Printf("Found %d cards\n", len(cards))
 		return saveCache(cacheLoc)
