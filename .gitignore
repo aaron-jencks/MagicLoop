@@ -22,3 +22,4 @@ go.work
 cmd/mloop/cards.json
 cmd/mloop/mloop
 .vscode/launch.json
+cmd/mloop/bulk.json
