@@ -34,6 +34,7 @@ type Card struct {
 	ColorIdentity []scryfall.Color // the color identity of the card
 	CardFaces     []CardFace       // the faces of this card
 	CardFace      int              // the current face of the card
+	Counters      map[int]int      // a map of the counters placed on this card
 }
 
 func (c Card) Equals(o Card) bool {
@@ -98,6 +99,7 @@ func CreateCardFromSDK(c scryfall.Card) Card {
 		ManaCost:      c.ManaCost,
 		ColorIdentity: c.ColorIdentity,
 		CardFaces:     cardfaces,
+		Counters:      map[int]int{},
 	}
 }
 
