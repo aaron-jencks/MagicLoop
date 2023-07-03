@@ -1,0 +1,23 @@
+[
+    {
+        "name": "Animate Wall",
+        "type": "enchantment",
+        "effect": [
+            "target type creature wall can attack"
+        ]
+    },
+    {
+        "name": "Armageddon",
+        "type": "sorcery",
+        "effect": [
+            "destroy all land"
+        ]
+    },
+    {
+        "name": "Balance",
+        "type": "sorcery",
+        "effect": [
+            "each player must sacrifice type land until count type land equal min player count type land"
+        ]
+    }
+]
