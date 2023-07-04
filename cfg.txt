@@ -1,0 +1,52 @@
+P => E;P | E;
+B => { P }
+
+COLOR => white | blue | black | red | green
+MCOLOR => COLOR | colorless
+COLOR_INDICATOR => MCOLOR | monocolored | multicolored
+LT => forest | island | mountain | swamp | plains
+CA => U | B | R | G | W
+PCA => CA | CA P
+
+PM => + | -
+NC => 0 | 1 | 2
+N => NC | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
+
+COST => {N}COST | {PCA}COST | {PCA} | {N}
+
+KEYCOUNT => deathtouch | double strike | first strike | flying | hexproof | indestructible | lifelink | menace | reach | shadow | trample | vigilance
+KEY => KEYCOUNT | defender | enchant | equip | flash | haste | intimidate | LTwalk | protection
+
+COUNT => poison | PM NC/PM NC | loyalty | oil | energy | acorn | aegis | age | aim | arrow | arrowhead | awakening | blaze | blood | bloodline | book | 
+    bounty | brick | burden | cage | carrion | charge | coin | collection | component | contested | corruption | crank | credit | croak | corpse | crystal | 
+    cube | currency | death | defense | delay | depletion | descent | despair | devotion | divinity | doom | dream | echo | egg | elixir | ember | enlightened |
+    eon | experience | eyeball | eyestalk | fade | feather | fetch | filibuster | flame | flood | foreshadow | fungus | fury | fuse | gem | ghostform | glyph |
+    gold | growth | hack | harmony | hatching | hatchling | healing | hit | hope | hone | hoofprint | hour | hourglass | hunger | ice | incarnation | 
+    incubation | infection | influence | ingenuity | intel | intervention | invitation | isolation | javelin | judgement | KEYCOUNT | ki | kick | knickknack | 
+    knowledge | landmark | level | lore | luck | magnet | manabound | manifestation | mannequin | mask | matrix | midway | mine | mining | mire | music | 
+    muster | necrodermis | net | night | omen | ore | page | pain | palliation | paralyzation | pause | petal | petrification | phyresis | phylactery | pin |
+    plague | plot | point | polyp | pressure | prey | pupa | quest | rejection | reprieve | ribbon | ritual | rope | rust | scream | scroll | shell | shield |
+    silver | shred | sleep | sleight | slime | slumber | soot | soul | spark | spite | spore | stash | storage | story | strife | study | stun | suspect | 
+    task | theft | ticket | tide | time | tower | training | trap | treasure | unity | valor | velocity | verse | vitality | void | volatile | vortex | vow |
+    voyage | wage | winch | wind | wish
+
+PENT => permanents | instants | sorceries | enchantments | creatures | spells
+ENT => permanent | instant | sorcery | enchantment | creature | spell
+SEL => ENT | opposing ENT | your ENT | player | opponent
+PSEL => PENT | opposing PENT | your PENT | players | opponents
+
+T => target SEL | target PSEL 
+S => PSEL | [ for S if SC ]
+SC => ENT with C | PENT with C
+C => lowest Q | highest Q | 
+
+Q => votes | health | attack | defense | COUNT counters
+
+L => map S B
+
+MSINK => cumulative upkeep | PENT | activated abilities
+
+CPROD => COST mana of any type a SEL coult produce | COST
+MPROD => produce CPROD | produce CPROD for MSINK
+
+E => produce COST 
