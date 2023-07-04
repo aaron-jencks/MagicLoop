@@ -5,11 +5,12 @@ COLOR => white | blue | black | red | green
 MCOLOR => COLOR | colorless
 COLOR_INDICATOR => MCOLOR | monocolored | multicolored
 LT => forest | island | mountain | swamp | plains
-CA => U | B | R | G | W
+CA => U | B | R | G | W | S
 PCA => CA | CA P
+MCA => PCA | PCA/PCA | N/PCA | PCA/N
 
 PM => + | -
-NC => 0 | 1 | 2
+NC => x | 0 | 1 | 2
 N => NC | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
 
 COST => {N}COST | {PCA}COST | {PCA} | {N}
