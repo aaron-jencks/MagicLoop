@@ -1,17 +1,31 @@
 package magicloop
 
+type ICard interface {
+	Play() IAction
+	Sacrifice() IAction
+	Discard() IAction
+	ActivatedAbilities() []IAction
+	HasTrigger(int) bool
+	Trigger(int) IAction
+	Morph() IAction
+	Manifest() IAction
+}
+
 type IGameState interface {
+	IClonable
 	Step() []IGameState      // performs the current action and returns a list of next possible actions
 	ValidActions() []IAction // returns the valid list of actions for the current state
 }
 
 type IAction interface {
+	IClonable
 	Act(IGameState) // performs this action on the current gamestate
 	String() string // returns the string representation of this action
 	Card() Card     // returns the card associated with this action
 }
 
 type IGame interface {
+	IClonable
 	Equals(IGame) bool // determines if one game is equal to another
 }
 

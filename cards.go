@@ -24,6 +24,10 @@ func (cf CardFace) Equals(o CardFace) bool {
 		cf.Text == o.Text
 }
 
+func (cf CardFace) Clone() interface{} {
+	return cf
+}
+
 type Card struct {
 	Id            string           // unique Id of the card
 	Name          string           // the card name
@@ -83,6 +87,22 @@ func (c Card) Equals(o Card) bool {
 		c.Text == o.Text &&
 		c.Layout == o.Layout &&
 		c.ManaCost == o.ManaCost
+}
+
+func (c Card) Clone() interface{} {
+	cc := Card{}
+	cc = c
+	cc.ColorIdentity = make([]scryfall.Color, len(c.ColorIdentity))
+	copy(cc.ColorIdentity, c.ColorIdentity)
+	cc.CardFaces = make([]CardFace, len(c.CardFaces))
+	for ci := range c.CardFaces {
+		cc.CardFaces[ci] = c.CardFaces[ci].Clone().(CardFace)
+	}
+	cc.Counters = map[int]int{}
+	for k, v := range c.Counters {
+		cc.Counters[k] = v
+	}
+	return cc
 }
 
 func CreateCardFromSDK(c scryfall.Card) Card {

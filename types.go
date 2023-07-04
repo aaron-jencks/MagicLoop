@@ -31,6 +31,43 @@ type Game struct {
 	mana          map[int]int
 }
 
+func (g Game) Clone() interface{} {
+	var result Game = Game{
+		graveyard:     make([]Card, len(g.graveyard)),
+		exile:         make([]Card, len(g.exile)),
+		mapped_exiles: map[string][]Card{},
+		counters:      map[int]int{},
+		stack:         make([]IAction, len(g.stack)),
+		mana:          map[int]int{},
+	}
+
+	for gi := range g.graveyard {
+		result.graveyard[gi] = g.graveyard[gi].Clone().(Card)
+	}
+	for ei := range g.exile {
+		result.exile[ei] = g.exile[ei].Clone().(Card)
+	}
+	for si := range g.stack {
+		result.stack[si] = g.stack[si].Clone().(IAction)
+	}
+
+	for k, v := range g.mapped_exiles {
+		result.mapped_exiles[k] = make([]Card, len(v))
+		for vi := range v {
+			result.mapped_exiles[k][vi] = v[vi].Clone().(Card)
+		}
+	}
+
+	for k, v := range g.counters {
+		result.counters[k] = v
+	}
+	for k, v := range g.mana {
+		result.mana[k] = v
+	}
+
+	return result
+}
+
 func (g Game) Equals(other IGame) bool {
 	og, ok := other.(Game)
 	if !ok {
@@ -114,6 +151,43 @@ type GameState struct {
 	previous_states []IGame
 	actions         []IAction
 	cards           []Card
+}
+
+func (gs GameState) Step() []IGameState {
+	gs.current_action.Act(gs)
+	actions := gs.ValidActions()
+
+	var result []IGameState
+	for _, act := range actions {
+		gsc := gs.Clone().(GameState)
+		gsc.current_action = act
+		result = append(result, gsc)
+	}
+	return result
+}
+
+func (gs GameState) ValidActions() []IAction {
+	return nil
+}
+
+func (gs GameState) Clone() interface{} {
+	var result GameState = GameState{
+		current_action:  gs.current_action,
+		game:            gs.game,
+		previous_states: make([]IGame, len(gs.previous_states)),
+		actions:         make([]IAction, len(gs.actions)),
+		cards:           make([]Card, len(gs.cards)),
+	}
+	for psi := range gs.previous_states {
+		result.previous_states[psi] = gs.previous_states[psi].Clone().(IGame)
+	}
+	for ai := range gs.actions {
+		result.actions[ai] = gs.actions[ai].Clone().(IAction)
+	}
+	for ci := range gs.cards {
+		result.cards[ci] = gs.cards[ci].Clone().(Card)
+	}
+	return result
 }
 
 type Simulation struct {
